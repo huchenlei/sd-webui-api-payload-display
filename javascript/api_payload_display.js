@@ -14,6 +14,7 @@
     }
 
     function updateJsonTree(wrapper, data) {
+        wrapper.innerHTML = '';
         // Create json-tree
         const tree = jsonTree.create(JSON.parse(data), wrapper);
         // Expand all (or selected) child nodes of root
