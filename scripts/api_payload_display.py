@@ -61,8 +61,8 @@ def make_json_compatible(value: Any) -> Any:
 
     if hasattr(value, "__dict__"):
         return make_json_compatible(vars(value))
-    
-    if value in (float('inf'), float('-inf')):
+
+    if value in (float("inf"), float("-inf")):
         return None
 
     print(f"Error: Cannot convert {value} to JSON compatile format.")
@@ -70,7 +70,16 @@ def make_json_compatible(value: Any) -> Any:
 
 
 def selectable_script_payload(p: StableDiffusionProcessing) -> Dict:
-    """ """
+    """
+    Get payload for selectable script based on the provided processing object.
+
+    Args:
+        p (StableDiffusionProcessing): Processing object containing script information.
+
+    Returns:
+        dict: A dictionary with the name of the selected script and its arguments. If no script is selected,
+        the function returns a dictionary with 'None' as the script name and an empty list for script arguments.
+    """
     script_runner: scripts.ScriptRunner = p.scripts
 
     selectable_script_index = p.script_args[0]
@@ -89,7 +98,15 @@ def selectable_script_payload(p: StableDiffusionProcessing) -> Dict:
 
 
 def alwayson_script_payload(p: StableDiffusionProcessing) -> Dict:
-    """ """
+    """
+    Get payloads for always-on scripts based on the provided processing object.
+
+    Args:
+        p (StableDiffusionProcessing): Processing object containing script information.
+
+    Returns:
+        dict: A dictionary with all always-on scripts along with their arguments.
+    """
     script_runner: scripts.ScriptRunner = p.scripts
 
     all_scripts: List[Dict[str, List]] = []
@@ -107,7 +124,15 @@ def alwayson_script_payload(p: StableDiffusionProcessing) -> Dict:
 
 
 def seed_enable_extras_payload(p: StableDiffusionProcessing) -> Dict:
-    """ """
+    """
+    Determine if seed extras should be enabled based on the provided processing object.
+
+    Args:
+        p (StableDiffusionProcessing): Processing object containing seed information.
+
+    Returns:
+        dict: A dictionary indicating if seed extras should be enabled.
+    """
     return {
         "seed_enable_extras": not (
             p.subseed == -1
@@ -167,7 +192,7 @@ def format_payload(payload: Optional[Dict]) -> str:
     if payload is None:
         return "No Payload Found"
     return json.dumps(payload, sort_keys=True, allow_nan=False)
-    
+
 
 class Script(scripts.Script):
     def __init__(self) -> None:
@@ -199,7 +224,9 @@ class Script(scripts.Script):
                 elem_id=f"{process_type_prefix}-api-payload-pull",
             )
             gr.HTML(value='<div class="api-payload-json-tree"></div>')
-            self.json_content = gr.Textbox(elem_classes=["api-payload-content"], visible=False)
+            self.json_content = gr.Textbox(
+                elem_classes=["api-payload-content"], visible=False
+            )
 
         pull_button.click(
             lambda: gr.Textbox.update(value=format_payload(self.api_payload)),
