@@ -39,9 +39,9 @@ def img_to_data_url(img: np.ndarray) -> str:
 def make_json_compatible(value: Any) -> Any:
     def is_jsonable(x):
         try:
-            json.dumps(x)
+            json.dumps(x, allow_nan=False)
             return True
-        except (TypeError, OverflowError):
+        except (TypeError, OverflowError, ValueError):
             return False
 
     if is_jsonable(value):
@@ -61,6 +61,9 @@ def make_json_compatible(value: Any) -> Any:
 
     if hasattr(value, "__dict__"):
         return make_json_compatible(vars(value))
+    
+    if value in (float('inf'), float('-inf')):
+        return None
 
     print(f"Error: Cannot convert {value} to JSON compatile format.")
     return None
@@ -160,17 +163,16 @@ def api_payload_dict(
     return make_json_compatible(result)
 
 
-def format_payload_as_html(payload: Optional[Dict]) -> str:
+def format_payload(payload: Optional[Dict]) -> str:
     if payload is None:
-        return "<p>No Payload Found</p>"
-
-    return f"<pre>{json.dumps(payload, sort_keys=True, indent=4)}</pre>"
-
+        return "No Payload Found"
+    return json.dumps(payload, sort_keys=True, allow_nan=False)
+    
 
 class Script(scripts.Script):
     def __init__(self) -> None:
         super().__init__()
-        self.json_display: Optional[gr.HTML] = None
+        self.json_content: Optional[gr.HTML] = None
         self.api_payload: Optional[Dict] = None
 
     def title(self) -> str:
@@ -184,7 +186,7 @@ class Script(scripts.Script):
         The return value should be an array of all components that are used in processing.
         Values of those returned components will be passed to run() and process() functions.
         """
-        process_type_prefix = 'img2img' if is_img2img else 'txt2img'
+        process_type_prefix = "img2img" if is_img2img else "txt2img"
 
         with gr.Accordion(
             f"API payload", open=False, elem_classes=["api-payload-display"]
@@ -196,12 +198,13 @@ class Script(scripts.Script):
                 elem_classes=["api-payload-pull"],
                 elem_id=f"{process_type_prefix}-api-payload-pull",
             )
-            self.json_display = gr.HTML()
-            
+            gr.HTML(value='<div class="api-payload-json-tree"></div>')
+            self.json_content = gr.Textbox(elem_classes=["api-payload-content"], visible=True)
+
         pull_button.click(
-            lambda: gr.HTML.update(value=format_payload_as_html(self.api_payload)),
+            lambda: gr.Textbox.update(value=format_payload(self.api_payload)),
             inputs=[],
-            outputs=[self.json_display],
+            outputs=[self.json_content],
         )
         return []
 
@@ -227,4 +230,3 @@ class Script(scripts.Script):
                 "Exception": str(e),
                 "Traceback": "".join(tb_str),
             }
-        
