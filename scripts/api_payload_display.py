@@ -109,17 +109,11 @@ def alwayson_script_payload(p: StableDiffusionProcessing) -> Dict:
     """
     script_runner: scripts.ScriptRunner = p.scripts
 
-    all_scripts: List[Dict[str, List]] = []
+    all_scripts: Dict[str, List] = {}
     for alwayson_script in script_runner.alwayson_scripts:
-        all_scripts.append(
-            {
-                alwayson_script.title(): {
-                    "args": p.script_args[
-                        alwayson_script.args_from : alwayson_script.args_to
-                    ]
-                },
-            }
-        )
+        all_scripts[alwayson_script.title()] = {
+            "args": p.script_args[alwayson_script.args_from : alwayson_script.args_to]
+        }
     return {"alwayson_scripts": all_scripts}
 
 
