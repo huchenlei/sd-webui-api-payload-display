@@ -22,6 +22,39 @@
         });
     }
 
+    async function copyText(copyText, copyButton) {
+        try {
+            await navigator.clipboard.writeText(copyText);
+            copyButton.innerHTML = "Copied!";
+            copyButton.classList.add('success');
+            copyButton.classList.remove('fail');
+
+            // After 3 seconds, revert the button text and style
+            setTimeout(() => {
+                copyButton.innerHTML = "Copy📋";
+                copyButton.classList.remove('success');
+            }, 3000);
+        } catch (err) {
+            copyButton.innerHTML = "Failed to copy";
+            copyButton.classList.remove('success');
+            copyButton.classList.add('fail');
+        }
+    }
+
+
+    function addCopyToClipboardButton(accordion, textarea) {
+        const span = accordion.querySelector('.label-wrap span');
+        const button = document.createElement('button');
+        button.classList.add('api-payload-copy-button');
+        button.innerHTML = 'Copy📋';
+        button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            copyText(textarea.value, button);
+        });
+        span.appendChild(button);
+    }
+
     onUiUpdate(() => {
         const panels = gradioApp().querySelectorAll(".api-payload-display");
         if (!panels) return;
@@ -55,6 +88,7 @@
                 }).observe(resultElement, { childList: true });
             });
 
+            addCopyToClipboardButton(panel, payloadTextbox);
             registeredElements.add(panel);
         }
     });

@@ -1,3 +1,26 @@
+button.api-payload-copy-button {
+    font-size: x-small !important;
+    font-weight: bold !important;
+    padding: 2px !important;
+    box-shadow: var(--shadow-drop);
+    border: 1px solid var(--button-secondary-border-color);
+    border-radius: var(--radius-sm);
+    background: var(--background-fill-primary);
+    height: var(--size-5);
+    color: var(--block-label-text-color) !important;
+    margin-left: var(--size-2) !important;
+}
+
+.api-payload-copy-button.success {
+    color: green;
+    border: 2px solid green;
+}
+
+.api-payload-copy-button.fail {
+    color: red;
+    border: 2px solid red;
+}
+
 .api-payload-display li {
     list-style-type: none;
 }

@@ -199,7 +199,7 @@ class Script(scripts.Script):
                 elem_id=f"{process_type_prefix}-api-payload-pull",
             )
             gr.HTML(value='<div class="api-payload-json-tree"></div>')
-            self.json_content = gr.Textbox(elem_classes=["api-payload-content"], visible=True)
+            self.json_content = gr.Textbox(elem_classes=["api-payload-content"], visible=False)
 
         pull_button.click(
             lambda: gr.Textbox.update(value=format_payload(self.api_payload)),
