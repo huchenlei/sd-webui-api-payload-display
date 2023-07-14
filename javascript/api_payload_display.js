@@ -25,6 +25,10 @@
 
     async function copyText(copyText, copyButton) {
         try {
+            if (!navigator.clipboard) {
+                throw ('Clipboard API not available, please make sure you are using HTTPS.');
+            }
+
             await navigator.clipboard.writeText(copyText);
             copyButton.innerHTML = "Copied!";
             copyButton.classList.add('success');
