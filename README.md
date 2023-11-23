@@ -8,6 +8,4 @@ Display the corresponding API payload after each generation on WebUI
 - Click `copy` to copy the json payload to clipboard.
 
 # Note
-This extension implements [this feature request](https://github.com/AUTOMATIC1111/stable-diffusion-webui/issues/9120). However, due to the inactivity of A1111 repo, 
-I decided to make it an extension. I will happy if this feature can make into the
-A1111 main repo someday.
+This extension implements [this feature request](https://github.com/AUTOMATIC1111/stable-diffusion-webui/issues/9120).
