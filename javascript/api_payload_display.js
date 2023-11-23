@@ -78,8 +78,11 @@
             generateButton.addEventListener('click', () => {
                 // There is id conflict on the page. So apply class selector
                 // as well.
-                const resultElement = gradioApp().querySelector(
+                const progressPanel = gradioApp().querySelector(
                     `#${processType}_results_panel`);
+                const progressDiv = gradioApp().querySelector(
+                    `#${processType}_results`);
+                resultElement = progressPanel ? progressPanel : progressDiv;
 
                 new MutationObserver((_, observer) => {
                     // The click is only triggered when
