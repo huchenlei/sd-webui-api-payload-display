@@ -12,6 +12,7 @@ import numpy as np
 from PIL import Image
 
 import modules.scripts as scripts
+from modules import shared, script_callbacks
 from modules.api.models import (
     StableDiffusionImg2ImgProcessingAPI,
     StableDiffusionTxt2ImgProcessingAPI,
@@ -20,6 +21,8 @@ from modules.processing import (
     StableDiffusionProcessing,
     StableDiffusionProcessingImg2Img,
 )
+
+BASE64_IMAGE_PLACEHOLDER = "base64image placeholder"
 
 
 def img_to_data_url(img: np.ndarray) -> str:
@@ -57,7 +60,10 @@ def make_json_compatible(value: Any) -> Any:
         return make_json_compatible(value.value)
 
     if isinstance(value, np.ndarray):
-        return img_to_data_url(value)
+        if shared.opts.data.get("api_display_include_base64_images", False):
+            return img_to_data_url(value)
+        else:
+            return BASE64_IMAGE_PLACEHOLDER
 
     if hasattr(value, "__dict__"):
         return make_json_compatible(vars(value))
@@ -177,6 +183,11 @@ def api_payload_dict(
         value = getattr(p, name)
         if value is None:
             continue
+        # `init_images` is an image object that not easily converted to base64 string.
+        # Here we just render a placeholder.
+        if isinstance(p, StableDiffusionProcessingImg2Img) and name == "init_images":
+            assert isinstance(value, list)
+            value = [BASE64_IMAGE_PLACEHOLDER]
         result[name] = value
 
     return make_json_compatible(result)
@@ -251,3 +262,20 @@ class Script(scripts.Script):
                 "Exception": str(e),
                 "Traceback": "".join(tb_str),
             }
+
+
+def on_ui_settings():
+    section = ("api_display", "API Display")
+    shared.opts.add_option(
+        "api_display_include_base64_images",
+        shared.OptionInfo(
+            False,
+            "Include base64 images in the payload.",
+            gr.Checkbox,
+            {"interactive": True},
+            section=section,
+        ),
+    )
+
+
+script_callbacks.on_ui_settings(on_ui_settings)
