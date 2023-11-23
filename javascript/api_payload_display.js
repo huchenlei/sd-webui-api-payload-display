@@ -79,7 +79,7 @@
                 // There is id conflict on the page. So apply class selector
                 // as well.
                 const resultElement = gradioApp().querySelector(
-                    `#${processType}_results`);
+                    `#${processType}_results_panel`);
 
                 new MutationObserver((_, observer) => {
                     // The click is only triggered when
